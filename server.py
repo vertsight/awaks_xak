@@ -52,7 +52,7 @@ model = Wav2Vec2ForCTC.from_pretrained(MODEL_NAME)
 
 giga = GigaChat(
     # Для авторизации запросов используйте ключ, полученный в проекте GigaChat API
-    credentials="YmYzMDY3NmMtMzE4Mi00ZGZiLWE2ZDYtZjM5N2MyNzJiYmVmOjA2OWExNjZlLWVkMmItNGI3Ny04ZjM1LWFlOTY5ODM4Nzc3Mg==",
+    credentials="",
     verify_ssl_certs=False,
 )
 
