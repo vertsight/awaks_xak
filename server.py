@@ -1,5 +1,4 @@
 import os
-# import sys
 import tempfile
 from fastapi import Body, FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.responses import FileResponse, JSONResponse
@@ -22,36 +21,26 @@ from asyncmy import connect, Pool
 import requests
 from doc.LoadData import load_protocol_data
 from doc.PrintProtocol import create_protocol
-# from tg.Main import check_updates_loop
 
 app = FastAPI()
 
-origins = ["*"]  # Разрешаем доступ с любого домена (* означает любой источник)
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # разрешаем любые HTTP-методы
-    allow_headers=["*"]  # разрешаем любые заголовки
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 speller = YandexSpeller()
 
-# log_file = open("log.txt", "a", encoding="utf-8")  # append mode
-# sys.stdout = log_file
-# sys.stderr = log_file  # логировать также ошибки
-
-# Модель
 MODEL_NAME = "bond005/wav2vec2-large-ru-golos"
 processor = Wav2Vec2Processor.from_pretrained(MODEL_NAME)
 model = Wav2Vec2ForCTC.from_pretrained(MODEL_NAME)
 
-# tokenizer = AutoTokenizer.from_pretrained("ai-forever/FRED-T5-large")
-# model_2 = AutoModelForSeq2SeqLM.from_pretrained("ai-forever/FRED-T5-large")
-
 giga = GigaChat(
-    # Для авторизации запросов используйте ключ, полученный в проекте GigaChat API
     credentials="",
     verify_ssl_certs=False,
 )
@@ -64,7 +53,6 @@ def make_text_better(text: str):
         {text}
         """)
     ]
-    # messages.append(HumanMessage(content=f"Исправь все ошибки в тексте и улучши пунктуацию. НЕ МЕНЯЙ СТРУКТУРУ ТЕКСТА. Отдельно выведи все основные вопросы, про которые часто говорят, выведи их в скобках. \n\nТекст:\n{text}"))
     res = giga.invoke(messages)
     messages.append(res)
     print("GigaChat: ", res.content)
@@ -79,7 +67,6 @@ def category_text(text: str):
         {text}
         """)
     ]
-    # messages.append(HumanMessage(content=f"Исправь все ошибки в тексте и улучши пунктуацию. НЕ МЕНЯЙ СТРУКТУРУ ТЕКСТА. Отдельно выведи все основные вопросы, про которые часто говорят, выведи их в скобках. \n\nТекст:\n{text}"))
     res = giga.invoke(messages)
     messages.append(res)
     print("GigaChat: ", res.content)
@@ -97,12 +84,11 @@ def get_text_info(text: str):
         2. Используй ключевые темы обсуждения
         3. Без дополнительных символов (*, - и т.д.)
         4. Не включай оригинальный текст в ответ
-        5. Язык сохраняй как в оригинале        
+        5. Язык сохраняй как в оригинале
         Сам текст:
         {text}
         """)
     ]
-    # messages.append(HumanMessage(content=f"Исправь все ошибки в тексте и улучши пунктуацию. НЕ МЕНЯЙ СТРУКТУРУ ТЕКСТА. Отдельно выведи все основные вопросы, про которые часто говорят, выведи их в скобках. \n\nТекст:\n{text}"))
     res = giga.invoke(messages)
     messages.append(res)
     print("GigaChat: ", res.content)
@@ -118,21 +104,17 @@ async def recognize_speech(
         raise HTTPException(status_code=400, detail="Unsupported file format")
 
     try:
-        # Сохраняем файл
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
             content = await audio_file.read()
             temp_audio.write(content)
             temp_audio_path = temp_audio.name
 
-        # Загружаем аудио с torchaudio
         waveform, sr = torchaudio.load(temp_audio_path)
 
-        # Преобразуем частоту дискретизации, если нужно
         if sr != sampling_rate:
             resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=sampling_rate)
             waveform = resampler(waveform)
 
-        # Приводим к нужному формату (один канал)
         if waveform.shape[0] > 1:
             waveform = torch.mean(waveform, dim=0, keepdim=True)
 
@@ -142,7 +124,6 @@ async def recognize_speech(
             sampling_rate=sampling_rate
         ).input_values
 
-        # Модельное предсказание
         with torch.no_grad():
             logits = model(input_values).logits
 
@@ -253,7 +234,7 @@ MYSQL_CONFIG = {
     "user": "koyltoh4_let",
     "password": "%WBUax5Bn8UG",
     "database": "koyltoh4_let",
-    "port": 3306  # стандартный порт MySQL
+    "port": 3306
 }
 
 async def get_db_pool():
@@ -271,7 +252,6 @@ async def create_conference(conference_data: ConferenceCreate):
         async with await get_db_pool() as pool:
             async with pool.acquire() as conn:
                 async with conn.cursor() as cursor:
-                    # 1. Создаем конференцию
                     await cursor.execute(
                         """INSERT INTO Conferences (name, description, original_text, improved_text)
                         VALUES (%s, %s, %s, %s)""",
@@ -280,7 +260,6 @@ async def create_conference(conference_data: ConferenceCreate):
                     )
                     conference_id = cursor.lastrowid
                     
-                    # 2. Добавляем категории
                     for category_id in conference_data.categories:
                         await cursor.execute(
                             """INSERT INTO ConferenceCategories (conference_id, category_id)
@@ -288,7 +267,6 @@ async def create_conference(conference_data: ConferenceCreate):
                             (conference_id, category_id)
                         )
                     
-                    # 3. Добавляем подтемы с пользователями
                     for subtheme in conference_data.subthemes:
                         await cursor.execute(
                             """INSERT INTO Subthemes (conference_id, name, description, type_id)
@@ -297,7 +275,6 @@ async def create_conference(conference_data: ConferenceCreate):
                         )
                         subtheme_id = cursor.lastrowid
                         
-                        # Добавляем связи с пользователями
                         for user_id in subtheme.user_ids:
                             await cursor.execute(
                                 """INSERT INTO UsersSubthemes (subtheme, user)
@@ -319,7 +296,6 @@ async def get_conference(conference_id: int):
         async with await get_db_pool() as pool:
             async with pool.acquire() as conn:
                 async with conn.cursor() as cursor:
-                    # Получаем данные конференции
                     await cursor.execute(
                         """SELECT id, name, description, original_text, improved_text 
                            FROM Conferences WHERE id = %s""",
@@ -330,7 +306,6 @@ async def get_conference(conference_id: int):
                     if not conference:
                         raise HTTPException(status_code=404, detail="Conference not found")
                     
-                    # Получаем подтемы с пользователями
                     await cursor.execute(
                         """SELECT id, name, description, type_id 
                            FROM Subthemes WHERE conference_id = %s""",
@@ -343,7 +318,6 @@ async def get_conference(conference_id: int):
                         subtheme = dict(zip(columns, row))
                         subtheme_id = subtheme['id']
                         
-                        # Получаем пользователей для подтемы
                         await cursor.execute(
                             """SELECT u.id, u.name, u.surname, u.patronomic, 
                                       u.role_id, u.telephone, u.email
@@ -377,7 +351,6 @@ async def update_conference(conference_id: int, conference_data: ConferenceCreat
         async with await get_db_pool() as pool:
             async with pool.acquire() as conn:
                 async with conn.cursor() as cursor:
-                    # Обновляем конференцию
                     await cursor.execute(
                         """UPDATE Conferences 
                         SET name = %s, description = %s,
@@ -388,7 +361,6 @@ async def update_conference(conference_id: int, conference_data: ConferenceCreat
                          conference_id)
                     )
                     
-                    # Получаем текущие подтемы
                     await cursor.execute(
                         "SELECT id FROM Subthemes WHERE conference_id = %s",
                         (conference_id,)
@@ -396,10 +368,8 @@ async def update_conference(conference_id: int, conference_data: ConferenceCreat
                     old_subtheme_ids = [row[0] for row in await cursor.fetchall()]
                     new_subtheme_ids = []
                     
-                    # Обновляем подтемы
                     for subtheme in conference_data.subthemes:
                         if hasattr(subtheme, 'id') and subtheme.id:
-                            # Обновляем существующую подтему
                             await cursor.execute(
                                 """UPDATE Subthemes 
                                 SET name = %s, description = %s, type_id = %s
@@ -408,7 +378,6 @@ async def update_conference(conference_id: int, conference_data: ConferenceCreat
                             )
                             subtheme_id = subtheme.id
                         else:
-                            # Создаем новую подтему
                             await cursor.execute(
                                 """INSERT INTO Subthemes 
                                 (conference_id, name, description, type_id)
@@ -419,7 +388,6 @@ async def update_conference(conference_id: int, conference_data: ConferenceCreat
                         
                         new_subtheme_ids.append(subtheme_id)
                         
-                        # Обновляем связи с пользователями
                         await cursor.execute(
                             "DELETE FROM UsersSubthemes WHERE subtheme = %s",
                             (subtheme_id,)
@@ -432,7 +400,6 @@ async def update_conference(conference_id: int, conference_data: ConferenceCreat
                                 (subtheme_id, user_id)
                             )
                     
-                    # Удаляем подтемы, которых больше нет
                     for old_id in old_subtheme_ids:
                         if old_id not in new_subtheme_ids:
                             await cursor.execute(
@@ -452,16 +419,13 @@ async def get_conferences_list():
         async with await get_db_pool() as pool:
             async with pool.acquire() as conn:
                 async with conn.cursor() as cursor:
-                    # Получаем список конференций
                     await cursor.execute(
                         """SELECT id, name, description 
                            FROM Conferences 
                            ORDER BY id DESC"""
                     )
                     
-                    # Получаем имена столбцов
                     columns = [col[0] for col in cursor.description]
-                    # Преобразуем в список словарей
                     conferences = [
                         dict(zip(columns, row))
                         for row in await cursor.fetchall()
@@ -533,16 +497,15 @@ async def create_yandex_tracker(board_data: TrackerBoardCreate):
         'X-Org-ID': '8236169'
     }
 
-    # Пример тела запроса для создания доски
     payload = {
         "name": board_data.conferenceData.name,
         "defaultQueue": {
-            "id": board_data.query.id,  # ID существующей очереди в трекере
-            "key": board_data.query.key  # Ключ очереди
+            "id": board_data.query.id,
+            "key": board_data.query.key
         },
         "boardType": "default",
         # "filter": {
-        #     "assignee": "USER_ID",  # ID пользователя
+        #     "assignee": "USER_ID",
         #     "priority": ["normal", "high"]
         # },
         # "orderBy": "created",
@@ -554,10 +517,8 @@ async def create_yandex_tracker(board_data: TrackerBoardCreate):
     }
 
     try:
-        # Отправляем POST-запрос
         response = requests.post(base_url + endpoint, headers=headers, data=json.dumps(payload))
 
-        # Анализируем ответ
         if response.status_code == 201:
             print("Доска создана успешно!")
             board_id = response.json().get('id')
@@ -700,7 +661,6 @@ async def download_file(request: ConferenceRequest):
 @app.post("/telegram/")
 async def bot_notificate():
     # notificate()
-    # check_updates_loop()
     return {"status": "success"}
 
 if __name__ == "__main__":
