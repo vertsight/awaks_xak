@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Совещания</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #0a0e10;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: auto;
+                background-color: #242424;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+            }
+            h1 {
+                text-align: center;
+                color: white;
+            }
+            h2 {
+                text-align: center;
+                color: white;
+            }
+            h4 {
+                color: white;
+                margin-bottom: 8px;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            label {
+                font-weight: bold;
+                color: white;
+            }
+            button {
+                background: linear-gradient(145deg, 
+                    rgba(107, 205, 96, 1) 0%, 
+                    rgba(32, 155, 160, 1) 50%, 
+                    rgba(107, 205, 96, 1) 100%
+                );
+                background-size: 200% 100%;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: transform 0.3s ease, background-position 1s ease;
+            }
+            button:hover {
+                transform: scale(1.01);
+                background-position: 100% 0;
+            }
+            .second-button {
+                background: linear-gradient(145deg, 
+                    rgba(96, 139, 205, 1) 0%,
+                    rgba(32, 90, 160, 1) 50%,
+                    rgba(96, 139, 205, 1) 100%
+                );
+                background-size: 200% 100%;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: transform 0.3s ease, background-position 1s ease;
+            }
+            .second-button:hover {
+                transform: scale(1.01);
+                background-position: 100% 0;
+            }
+            pre {
+                padding: 10px;
+                border-radius: 5px;
+                word-wrap: break-word;
+                white-space: pre-wrap;
+                color: white;
+            }
+            textarea {
+                border-radius: 5px;
+                color: black;
+                min-height: 50px;
+                width: 100%;
+                resize: vertical;
+            }
+            .theme-block{
+                border-radius: 5px;
+                width: 100%;
+                padding: 5px;
+                box-sizing: border-box;
+                margin-bottom: 5px;
+            }
+            .theme-block input{
+                width: 100%;
+                box-sizing: border-box;
+                padding: 8px;
+                border: 1px solid #444;
+                background-color: #333;
+                color: white;
+                border-radius: 4px;
+            }
+            .theme-block textarea{
+                width: 100%;
+                box-sizing: border-box;
+                padding: 8px;
+                border: 1px solid #444;
+                background-color: #333;
+                color: white;
+                border-radius: 4px;
+            }
+            #themes-block{
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                background-color: #2d2d2d;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            #conference-select {
+                width: 100%;
+                padding: 8px;
+                border-radius: 4px;
+                border: 1px solid #444;
+                background-color: #333;
+                color: white;
+                margin-bottom: 10px;
+            }
+
+            #conference-select option {
+                background-color: #333;
+                color: white;
+            }
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+            }
+
+            .modal-content {
+                background-color: #242424;
+                margin: 5% auto;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+
+            .close {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            .close:hover {
+                color: white;
+            }
+
+            .employee-item {
+                padding: 10px;
+                border-bottom: 1px solid #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            .employee-item:hover {
+            background-color: #333;
+            }
+
+            .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            }
+
+            .form-row input, .form-row select {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+            }
+
+            .modal-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            }
+            .user-tag {
+                display: inline-flex;
+                align-items: center;
+                background: #444;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 15px;
+                margin: 2px;
+                font-size: 0.9em;
+            }
+
+            .user-tag button.remove-user {
+                background: none;
+                border: none;
+                color: #ff6b6b;
+                margin-left: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                padding: 5px;
+            }
+
+            .theme-users {
+                margin-top: 10px;
+                padding: 10px;
+                background: #2d2d2d;
+                border-radius: 5px;
+            }
+
+            .add-user-btn {
+                background: #4a6fa5;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 5px;
+            }
+            .employee-item:hover {
+            background-color: #333;
+            cursor: pointer;
+            }
+
+            .employee-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            }
+
+            .selected-employee {
+            color: white;
+            padding: 5px 0;
+            border-bottom: 1px solid #444;
+            }
+
+            .remove-employee {
+            background: #ff4444;
+            border: none;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            }
+
+            .remove-employee:hover {
+            background: #cc0000;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="employee-modal" class="modal" style="display: none;">
+            <div class="modal-content" style="background-color: #242424; max-width: 600px;">
+                <span class="close">&times;</span>
+                <h3 style="color: white;">Выбор сотрудника</h3>
+                
+                <div class="modal-controls">
+                    <input type="text" id="employee-search" placeholder="Поиск по имени..." style="width: 60%;">
+                    <select id="role-filter" style="width: 35%;">
+                        <option value="0">Все роли</option>
+                    </select>
+                </div>
+                
+                <div id="employee-list" style="margin-top: 15px; max-height: 300px; overflow-y: auto;">
+                </div>
+
+                <div id="selected-employees" style="margin-top: 15px; padding: 10px; background: #333; border-radius: 5px;">
+                    <h4 style="color: white; margin-bottom: 10px; margin-top: 0px;">Выбранные сотрудники:</h4>
+                    <div id="selected-list"></div>
+                </div>
+                
+                <div class="flex" style="margin-top: 15px; margin: 10px;">
+                    <button id="add-employee-btn" style="margin-top: 15px;" class="second-button">+ Добавить нового сотрудника</button>
+                    <button id="save-employees-btn" style="margin-top: 15px;">Сохранить сотрудников</button>
+                </div>
+                
+                <div id="new-employee-form" style="display: none; margin-top: 15px;">
+                <h4 style="color: white;">Добавление сотрудника</h4>
+                <div class="form-row">
+                    <input type="text" id="new-name" placeholder="Имя" required>
+                    <input type="text" id="new-surname" placeholder="Фамилия" required>
+                </div>
+                <div class="form-row">
+                    <input type="text" id="new-patronymic" placeholder="Отчество">
+                    <select id="new-role" required>
+                    <option value="">Выберите роль</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="tel" id="new-phone" placeholder="Телефон" required>
+                    <input type="email" id="new-email" placeholder="Email" required>
+                </div>
+                <div class="form-row">
+                    <input type="password" id="new-password" placeholder="Пароль" required>
+                    <button id="save-employee-btn">Сохранить</button>
+                    <button id="cancel-add-btn">Отмена</button>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="container" style="margin-bottom: 50px;">
+            <div id="load-conference" style="margin-top: 20px;">
+                <h4>Загрузить существующее совещание</h4>
+                <div class="theme-block">
+                    <select id="conference-select" style="width: 100%; padding: 8px;">
+                        <option value="">Выберите совещание...</option>
+                    </select>
+                </div>
+                <button id="load-conference-btn" style="width: 100%; margin-top: 10px;">Загрузить</button>
+            </div>
+        </div>
+        <div class="container">
+            <input type="hidden" id="conference-id-hidden">
+            <textarea id="original-text-hidden" style="display: none;"></textarea>
+            <textarea id="improved-text-hidden" style="display: none;"></textarea>
+            <h1>Цифровой секретарь</h1>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <label for="audio">Выберите аудиофайл:</label>
+                <input style="color: white;" type="file" id="audio" name="audio_file" accept=".wav,.mp3,.ogg,.flac" required />
+                
+                <button type="submit">Отправить</button>
+            </form>
+            <div id="load">
+                <h4>Загружаем...</h4>
+            </div>
+            <div id="response">
+                <h4>Оригинальный текст</h4>
+                <textarea type="text" id="response-old"></textarea>
+                <h4>Улучшенный текст</h4>
+                <form id="categoryForm" enctype="multipart/form-data">
+                    <textarea name="new_text" id="response-new"></textarea>
+                    
+                    <button id="category-button" type="submit" style="display: none;">Разбить по темам</button>
+                </form>
+                <textarea name="new_text" type="text" style="display: none;" id="response-new-c"></textarea>
+            </div>
+            <div id="conference-details" style="display: none; margin-top: 20px;">
+                <h4>Детали совещания</h4>
+                <div class="theme-block">
+                    <input type="text" id="conference-name" placeholder="Название совещания" />
+                </div>
+                <div class="theme-block">
+                    <textarea id="conference-description" placeholder="Описание совещания"></textarea>
+                </div>
+            </div>
+            <h4 id="themes-block-title">Темы совещания</h4>
+            <div id="themes-block" style="display: none;">
+
+            </div>
+            <button id="create-json" style="width: 100%; margin-top: 10px;">Сохранить</button>
+
+            <div id="send-form">
+                <h4 style="color: white;">Способы отправки:</h4>
+                <div class="checkbox-group" style="margin-bottom: 15px;">
+                    <label style="color: white; display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="checkbox" id="telegram-checkbox" checked style="margin-right: 10px;">
+                        Телеграм бот
+                    </label>
+                    <label style="color: white; display: flex; align-items: center;">
+                        <input type="checkbox" id="yandex-checkbox" style="margin-right: 10px;">
+                        Яндекс Трекер
+                    </label>
+                </div>
+                <div id="yandex-fields" style="display: none; background: #2d2d2d; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                    <div class="theme-block" style="margin-bottom: 10px;">
+                        <input type="text" id="yandex-id" placeholder="ID очереди">
+                    </div>
+                    <div class="theme-block" style="margin-bottom: 10px;">
+                        <input type="text" id="yandex-key" placeholder="Ключ очереди">
+                    </div>
+                </div>
+                <button id="send" style="width: 100%; margin-top: 10px;">Отправить</button>
+                <button id="download-doc" style="width: 100%; margin-top: 10px;" class="second-button">Скачать в виде протокола</button>
+            </div>
+        </div>
+
+        <script>
+            window.onload = function() {
+                document.getElementById('response').style.display = "none";
+                // document.getElementById('response').style.display = "block";
+                document.getElementById('load').style.display = "none";
+                document.getElementById('create-json').style.display = "none";
+                document.getElementById('themes-block-title').style.display = "none";
+                document.getElementById('send-form').style.display = "none";
+            };
+            function parseMeetingText(text) {
+                const result = {
+                    title: '',
+                    description: '',
+                    content: ''
+                };
+
+                const lines = text.split('\n');
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    
+                    if (line.startsWith('Заголовок:')) {
+                        result.title = line.replace('Заголовок:', '').trim();
+                    } else if (line.startsWith('Описание:')) {
+                        result.description = line.replace('Описание:', '').trim();
+                    } else if (line.startsWith('Текст:')) {
+                        result.content = lines.slice(i + 1).join('\n').trim();
+                        break;
+                    }
+                }
+
+                return result;
+            }
+            function generateThemes(text, isCompleted){
+                document.getElementById("themes-block").style.display = "block";
+                document.getElementById("themes-block-title").style.display = "block";
+                if(isCompleted){
+                    themes = text;
+
+                    themes.forEach((element, index) => {
+                        const div = document.createElement('div');
+                        div.classList.add('theme-block');
+                        console.log(element);
+                        div.innerHTML = `
+                            <input data-field="name" type="text" value="${element.name || ''}" />
+                            <textarea data-field="description" placeholder="Описание темы">${element.description || ''}</textarea>
+                            <div class="theme-users" data-theme-index="${index}">
+                                <label>Участники:</label>
+                                <div class="user-tags"></div>
+                                <button type="button" class="add-user-btn">Добавить участника</button>
+                            </div>
+                        `;
+
+                        if (element.users) {
+                            const userTags = div.querySelector('.user-tags');
+                            element.users.forEach(user => {
+                                userTags.appendChild(createUserTag(user, index));
+                            });
+                        }
+                        
+                        div.querySelector('.add-user-btn').addEventListener('click', function() {
+                            openEmployeeModal(users => {
+                                const userTags = div.querySelector('.user-tags');
+                                users.forEach(user => {
+                                    userTags.appendChild(createUserTag(user, index));
+                                });
+                            });
+                        });
+
+                        document.getElementById("themes-block").appendChild(div);
+                    });
+                } else {
+                    themes = text.split("\n");
+
+                    let i = 1;
+                    themes.forEach((element, index) => {
+                        element.replace(`${i}.`, '');
+                        i++;
+                        const div = document.createElement('div');
+                        div.classList.add('theme-block');
+                        console.log(element);
+                        div.innerHTML = `
+                            <input type="text" value="${element || ''}" data-field="name"/>
+                            <textarea data-field="description" placeholder="Описание темы">${''}</textarea>
+                            <div class="theme-users" data-theme-index="${index}">
+                                <label>Участники:</label>
+                                <div class="user-tags"></div>
+                                <button type="button" class="add-user-btn">Добавить участника</button>
+                            </div>
+                        `;
+
+                        if (element.users) {
+                            const userTags = div.querySelector('.user-tags');
+                            element.users.forEach(user => {
+                                userTags.appendChild(createUserTag(user, index));
+                            });
+                        }
+                        
+                        div.querySelector('.add-user-btn').addEventListener('click', function() {
+                            openEmployeeModal(users => {
+                                const userTags = div.querySelector('.user-tags');
+                                users.forEach(user => {
+                                    userTags.appendChild(createUserTag(user, index));
+                                });
+                            });
+                        });
+                        document.getElementById("themes-block").appendChild(div);
+                    });
+                }
+                console.log(themes);
+            }
+            function createUserTag(user, themeIndex) {
+                const tag = document.createElement('div');
+                tag.className = 'user-tag';
+                tag.innerHTML = `
+                    <span>${user.surname} ${user.name}</span>
+                    <button type="button" class="remove-user" 
+                            data-user-id="${user.id}" 
+                            data-theme-index="${themeIndex}">×</button>
+                `;
+                
+                tag.querySelector('.remove-user').addEventListener('click', function() {
+                    tag.remove();
+                });
+                
+                return tag;
+            }
+            function collectConferenceData() {
+                const conferenceData = {
+                    name: document.getElementById('conference-name').value.trim(),
+                    description: document.getElementById('conference-description').value.trim(),
+                    original_text: document.getElementById('response-old').value.trim(),
+                    improved_text: document.getElementById('response-new').value.trim(),
+                    categories: [1],
+                    subthemes: []
+                };
+                
+                document.querySelectorAll('#themes-block .theme-block').forEach(themeBlock => {
+                    const subtheme = {
+                        name: themeBlock.querySelector('[data-field="name"]').value.trim(),
+                        description: themeBlock.querySelector('[data-field="description"]')?.value.trim() || '',
+                        type_id: 1,
+                        user_ids: []
+                    };
+                    
+                    themeBlock.querySelectorAll('.user-tag').forEach(tag => {
+                        const userId = parseInt(tag.querySelector('.remove-user').getAttribute('data-user-id'));
+                        subtheme.user_ids.push(userId);
+                    });
+                    
+                    conferenceData.subthemes.push(subtheme);
+                });
+                
+                return conferenceData;
+            }
+            function setupAutoResizeTextareas() {
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                    
+                    textarea.addEventListener('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
+                    });
+                });
+            }
+            async function loadConferencesList() {
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/conferences/');
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const select = document.getElementById('conference-select');
+                        select.innerHTML = '<option value="">Выберите совещание...</option>';
+                        
+                        data.conferences.forEach(conf => {
+                            const option = document.createElement('option');
+                            option.value = conf.id;
+                            option.textContent = `${conf.id} - ${conf.name}`;
+                            select.appendChild(option);
+                        });
+                    } else {
+                        alert(`Ошибка загрузки списка: ${data.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Не удалось загрузить список конференций');
+                }
+            }
+
+            window.addEventListener('DOMContentLoaded', function() {
+                loadConferencesList();
+                setupAutoResizeTextareas();
+                document.getElementById('response').style.display = "none";
+                document.getElementById('load').style.display = "none";
+            });
+
+            document.getElementById('load-conference-btn').addEventListener('click', async function() {
+                const conferenceId = document.getElementById('conference-select').value;
+                
+                if (!conferenceId) {
+                    alert('Пожалуйста, выберите совещание из списка');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`http://127.0.0.1:8000/conferences/${conferenceId}`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        document.getElementById('conference-id-hidden').value = conferenceId;
+                        
+                        document.getElementById('conference-name').value = data.conference.name || '';
+                        document.getElementById('conference-description').value = data.conference.description || '';
+                        
+                        document.getElementById('original-text-hidden').value = data.conference.original_text || '';
+                        document.getElementById('improved-text-hidden').value = data.conference.improved_text || '';
+                        document.getElementById('response-old').value = data.conference.original_text || '';
+                        document.getElementById('response-new').value = data.conference.improved_text || '';
+                        
+                        const themesBlock = document.getElementById('themes-block');
+                        themesBlock.innerHTML = '';
+                        
+                        if (data.subthemes?.length > 0) {
+                            generateThemes(data.subthemes, true);
+                        }
+                        
+                        document.getElementById('conference-details').style.display = "block";
+                        document.getElementById('themes-block').style.display = "block";
+                        document.getElementById('response').style.display = "block";
+                        document.getElementById('category-button').style.display = "block";
+                        document.getElementById('create-json').style.display = "block";
+                        document.getElementById('send-form').style.display = "block";
+                        
+                        setupAutoResizeTextareas();
+                    } else {
+                        alert(`Ошибка: ${data.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при загрузке конференции');
+                }
+            });
+            document.getElementById('yandex-checkbox').addEventListener('change', function() {
+                const yandexFields = document.getElementById('yandex-fields');
+                yandexFields.style.display = this.checked ? 'block' : 'none';
+            });
+            document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                document.getElementById('load').style.display = "block";
+
+                fetch('http://127.0.0.1:8000/recognize', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    document.getElementById('load').style.display = "none";
+                    document.getElementById('response').style.display = "block";
+                    document.getElementById('category-button').style.display = "block";
+
+                    document.getElementById('response-old').value = `${data.raw_text}`;
+                    document.getElementById('response-new').value = `${data.text}`;
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+            let employeeModalCallback = null;
+            let selectedEmployees = [];
+            let roles = [];
+
+            function openEmployeeModal(callback, currentSelection = []) {
+                selectedEmployees = [...currentSelection];
+                employeeModalCallback = callback;
+                document.getElementById('employee-modal').style.display = 'block';
+                renderSelectedEmployees();
+                loadRoles();
+                loadEmployees();
+
+                document.getElementById('save-employees-btn').addEventListener('click', saveEmployes);
+            }
+
+            function saveEmployes(){
+                employeeModalCallback(selectedEmployees);
+            }
+
+            function closeEmployeeModal() {
+                document.getElementById('employee-modal').style.display = 'none';
+                employeeModalCallback = null;
+            }
+
+            function initEmployeeModal() {
+                const modal = document.getElementById('employee-modal');
+                const closeBtn = document.querySelector('.close');
+                const addBtn = document.getElementById('add-employee-btn');
+                const cancelBtn = document.getElementById('cancel-add-btn');
+                
+                closeBtn.addEventListener('click', closeEmployeeModal);
+                
+                window.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                    closeEmployeeModal();
+                    }
+                });
+
+                addBtn.addEventListener('click', function() {
+                    document.getElementById('new-employee-form').style.display = 'block';
+                    addBtn.style.display = 'none';
+                });
+                
+                cancelBtn.addEventListener('click', function() {
+                    document.getElementById('new-employee-form').style.display = 'none';
+                    addBtn.style.display = 'block';
+                    clearNewEmployeeForm();
+                });
+
+                document.getElementById('employee-search').addEventListener('input', filterEmployees);
+                document.getElementById('role-filter').addEventListener('change', filterEmployees);
+                
+                document.getElementById('save-employee-btn').addEventListener('click', saveNewEmployee);
+            }
+
+            async function loadEmployees() {
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/users/');
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        console.log(data.users);
+                        employees = data.users;
+                        renderEmployeeList(employees);
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки сотрудников:', error);
+                }
+            }
+            async function saveNewEmployee() {
+                const newEmployee = {
+                    name: document.getElementById('new-name').value.trim(),
+                    surname: document.getElementById('new-surname').value.trim(),
+                    patronomic: document.getElementById('new-patronymic').value.trim() || null,
+                    role_id: parseInt(document.getElementById('new-role').value),
+                    telephone: document.getElementById('new-phone').value.trim(),
+                    email: document.getElementById('new-email').value.trim(),
+                    password: document.getElementById('new-password').value.trim()
+                };
+                
+                if (!newEmployee.name || !newEmployee.surname || !newEmployee.role_id || 
+                    !newEmployee.telephone || !newEmployee.email || !newEmployee.password) {
+                    alert('Пожалуйста, заполните все обязательные поля');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/users/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newEmployee)
+                    });
+                    
+                    if (response.ok) {
+                    alert('Сотрудник успешно добавлен');
+                    document.getElementById('new-employee-form').style.display = 'none';
+                    document.getElementById('add-employee-btn').style.display = 'block';
+                    await loadEmployees();
+                    } else {
+                    const error = await response.json();
+                    alert(`Ошибка: ${error.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при сохранении сотрудника');
+                }
+            }
+            async function loadRoles() {
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/roles/');
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                    roles = data.roles;
+                    const roleFilter = document.getElementById('role-filter');
+                    const newRoleSelect = document.getElementById('new-role');
+                    
+                    roleFilter.innerHTML = '<option value="0">Все роли</option>';
+                    newRoleSelect.innerHTML = '<option value="">Выберите роль</option>';
+                    
+                    roles.forEach(role => {
+                        roleFilter.innerHTML += `<option value="${role.id}">${role.name}</option>`;
+                        newRoleSelect.innerHTML += `<option value="${role.id}">${role.name}</option>`;
+                    });
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки ролей:', error);
+                }
+            }
+
+            function filterEmployees() {
+                const searchTerm = document.getElementById('employee-search').value.toLowerCase();
+                const roleId = parseInt(document.getElementById('role-filter').value);
+                
+                const filtered = employees.filter(employee => {
+                    const fullName = `${employee.surname} ${employee.name} ${employee.patronomic || ''}`.toLowerCase();
+                    const matchesSearch = fullName.includes(searchTerm);
+                    const matchesRole = roleId === 0 || employee.role_id === roleId;
+                    
+                    return matchesSearch && matchesRole;
+                });
+                
+                renderEmployeeList(filtered);
+            }
+
+            function renderSelectedEmployees() {
+                const container = document.getElementById('selected-list');
+                container.innerHTML = '';
+                
+                if (selectedEmployees.length === 0) {
+                    container.innerHTML = '<div style="color: #999;">Никто не выбран</div>';
+                    return;
+                }
+                
+                selectedEmployees.forEach(employee => {
+                    const div = document.createElement('div');
+                    div.className = 'selected-employee';
+                    div.style.display = 'flex';
+                    div.style.justifyContent = 'space-between';
+                    div.style.alignItems = 'center';
+                    div.style.padding = '5px 0';
+                    div.style.borderBottom = '1px solid #444';
+                    
+                    div.innerHTML = `
+                    <span style="color: white;">${employee.surname} ${employee.name}</span>
+                    <button class="remove-employee" data-id="${employee.id}" 
+                            style="background: #ff4444; border: none; color: white; padding: 2px 5px; border-radius: 3px;">
+                        ×
+                    </button>
+                    `;
+                    
+                    container.appendChild(div);
+                });
+            
+            document.querySelectorAll('.remove-employee').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    selectedEmployees = selectedEmployees.filter(e => e.id !== id);
+                    renderSelectedEmployees();
+                    
+                    updateEmployeeListCheckboxes();
+                    });
+                });
+            }
+
+            function updateEmployeeListCheckboxes() {
+                document.querySelectorAll('.employee-checkbox').forEach(checkbox => {
+                    const id = parseInt(checkbox.getAttribute('data-id'));
+                    checkbox.checked = selectedEmployees.some(e => e.id === id);
+                });
+            }
+
+            function renderEmployeeList(employeesToShow) {
+                const employeeList = document.getElementById('employee-list');
+                employeeList.innerHTML = '';
+                
+                employeesToShow.forEach(employee => {
+                    const role = roles.find(r => r.id === employee.role_id)?.name || 'Неизвестно';
+                    console.log(roles);
+                    console.log(roles.find(r => r.id === employee.role_id)?.name);
+                    const isSelected = selectedEmployees.some(e => e.id === employee.id);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'employee-item';
+                    div.style.display = 'flex';
+                    div.style.alignItems = 'center';
+                    div.style.gap = '10px';
+                    div.style.padding = '10px';
+                    div.style.borderBottom = '1px solid #444';
+                    
+                    div.innerHTML = `
+                    <input type="checkbox" class="employee-checkbox" data-id="${employee.id}" 
+                            ${isSelected ? 'checked' : ''} style="flex-shrink: 0;">
+                    <div style="flex-grow: 1;">
+                        <div><strong>${employee.surname} ${employee.name} ${employee.patronomic || ''}</strong></div>
+                        <div style="font-size: 0.9em; color: #aaa;">${role} • ${employee.email}</div>
+                    </div>
+                    `;
+                    
+                    const checkbox = div.querySelector('.employee-checkbox');
+                        checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            if (!selectedEmployees.some(e => e.id === employee.id)) {
+                            selectedEmployees.push(employee);
+                            }
+                        } else {
+                            selectedEmployees = selectedEmployees.filter(e => e.id !== employee.id);
+                        }
+                        renderSelectedEmployees();
+                    });
+                    
+                    div.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                    });
+                    
+                    employeeList.appendChild(div);
+                });
+            }
+
+            window.addEventListener('DOMContentLoaded', function() {
+                initEmployeeModal();
+            });
+
+            document.getElementById('categoryForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                console.log(formData.get('new_text'));
+
+                fetch('http://127.0.0.1:8000/optimize', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    console.log(data.text);
+                    generateThemes(data.text, false);
+                    document.getElementById('categoryForm').style.display = "none";
+                    document.getElementById('response-new-c').style.display = "block";
+                    document.getElementById('response-new-c').value = document.getElementById('response-new').value;
+                    document.getElementById('conference-details').style.display = "block";
+                })
+                .catch(error => console.error('Ошибка:', error));
+
+                fetch('http://127.0.0.1:8000/info', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    console.log(data.text);
+                    const parsed = parseMeetingText(data.text);
+                    document.getElementById('conference-name').value = parsed.title;
+                    document.getElementById('conference-description').value = parsed.description;
+
+                    document.getElementById('create-json').style.display = "block";
+                    document.getElementById('send-form').style.display = "block";
+                })
+                .catch(error => console.error('Ошибка:', error));
+            });
+            document.getElementById('create-json').addEventListener('click', async function() {
+                const conferenceId = document.getElementById('conference-id-hidden').value;
+                const isEditMode = !!conferenceId;
+                
+                const themeInputs = document.querySelectorAll('#themes-block .theme-block input');
+                const themeDescriptions = document.querySelectorAll('#themes-block .theme-block textarea');
+                
+                const subthemes = Array.from(themeInputs).map((input, index) => ({
+                    name: input.value.trim(),
+                    description: themeDescriptions[index]?.value.trim() || "",
+                    type_id: 1
+                }));
+
+                const conferenceData = collectConferenceData();
+
+                console.log(conferenceData);
+                console.log(JSON.stringify(conferenceData));
+
+                try {
+                    const url = isEditMode 
+                        ? `http://127.0.0.1:8000/conferences/${conferenceId}`
+                        : 'http://127.0.0.1:8000/conferences/';
+                        
+                    const method = isEditMode ? 'PUT' : 'POST';
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(conferenceData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        if (!isEditMode) {
+                            document.getElementById('conference-id-hidden').value = result.conference_id;
+                        }
+                        alert(isEditMode 
+                            ? `Конференция успешно обновлена! ID: ${result.conference_id}`
+                            : `Конференция успешно создана! ID: ${result.conference_id}`);
+                    } else {
+                        alert(`Ошибка: ${result.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при сохранении конференции');
+                }
+            });
+            document.getElementById('send').addEventListener('click', async function() {
+                const sendTelegram = document.getElementById('telegram-checkbox').checked;
+                const sendYandex = document.getElementById('yandex-checkbox').checked;
+
+                const conferenceData = collectConferenceData();
+
+                if(sendYandex){
+                    const query = {
+                        "id": document.getElementById('yandex-id').value,
+                        "key": document.getElementById('yandex-key').value,
+                    };
+    
+                    console.log(JSON.stringify({conferenceData, query}));
+    
+                    try {
+                        const url = "http://127.0.0.1:8000/tracker_board";
+
+                        const method = 'POST';
+                        
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({conferenceData, query})
+                        });
+    
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            alert("Данные в Яндекс Трекер отправлены");
+                        } else {
+                            alert(`Ошибка: ${result.detail || 'Неизвестная ошибка'}`);
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при сохранении конференции');
+                    }
+                } 
+                if(sendTelegram) {
+                    try {
+                        const url = "http://127.0.0.1:8000/telegram";
+
+                        const method = 'POST';
+                        
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+    
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            alert("Данные в бота отправлены");
+                        } else {
+                            alert(`Ошибка: ${result.detail || 'Неизвестная ошибка'}`);
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при сохранении конференции');
+                    }
+                }
+            });
+            document.getElementById('download-doc').addEventListener('click', async function() {
+                const conferenceData = collectConferenceData();
+
+                try {
+                    const url = "http://127.0.0.1:8000/download_doc";
+
+                    const method = 'POST';
+
+                    console.log(JSON.stringify({"name":conferenceData.name}));
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({"name":conferenceData.name})
+                    });
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const downloadUrl = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = downloadUrl;
+
+                        const contentDisposition = response.headers.get("Content-Disposition");
+                        let filename = "protocol.docx";
+                        if (contentDisposition) {
+                            const match = contentDisposition.match(/filename="?([^"]+)"?/);
+                            if (match?.[1]) {
+                                filename = match[1];
+                            }
+                        }
+
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(downloadUrl);
+                    } else {
+                        const result = await response.json();
+                        alert(`Ошибка: ${result.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при сохранении конференции');
+                }
+            });
+        </script>
+    </body>
+</html>
